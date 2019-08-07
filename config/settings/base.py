@@ -28,6 +28,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'wagtailreacttaxonomy',
+    'test_page',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',

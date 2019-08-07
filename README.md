@@ -1,18 +1,38 @@
-Wagtail - [[PACKAGE_NAME]]
+Wagtail - React Taxonomy
 =============================
 
-[[PACKAGE_DESCRIPTION]]
+Add React Taxonomy component to a wagtail page and store it as a json in the db.
 
 Quick start
 -----------
 
-[[TO_DO]]
+1. Add "wagtailreacttaxonomy" to your INSTALLED_APPS:
 
+```python
+INSTALLED_APPS = [
+    'wagtailreacttaxonomy',
+    ...
+]
+```
 
 How to use
 ----------
 
-[[TO_DO]]
+1. Add `TaxonomyMixin` to you wagtail Page model
+2. Add to the page `taxonomy_json` using `TaxonomyPanel`
+
+Example:
+```python
+class TestPage(Page, TaxonomyMixin):
+    taxonomy_panels = [
+        TaxonomyPanel('taxonomy_json', taxonomy_terms_id='test_taxonomy'),
+    ]
+
+    edit_handler = TabbedInterface([
+        ObjectList(Page.content_panels, heading='Content'),
+        ObjectList(taxonomy_panels, heading='Taxonomy'),
+    ])
+```
 
 
 How to contribute
