@@ -60,6 +60,8 @@ coverage.xml
 local_settings.py
 local.py
 
+# npm stuff:
+node_modules/
 
 # Flask stuff:
 instance/

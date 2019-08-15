@@ -2,6 +2,6 @@
     display: none;
 }
 
-#id_taxonomy_json {
+#id_taxonomy_json, #taxonomy-terms-json {
     display: none;
 }
