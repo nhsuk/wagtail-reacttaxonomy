@@ -5,3 +5,12 @@
 #id_taxonomy_json, #taxonomy-terms-json {
     display: none;
 }
+
+.term-chooser label {
+    float: none !important;
+    padding: 0.2em !important;
+}
+
+.term-chooser .accordion:before {
+    width: 8px;
+}
