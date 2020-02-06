@@ -71,6 +71,26 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+}
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
 var styles = function styles(theme) {
   return {
     root: {
@@ -135,27 +155,49 @@ var styles = function styles(theme) {
       }
     },
     tags: {
+      padding: 0,
+      margin: 0,
       '& li': {
-        display: 'inline-block',
+        display: 'inline-flex',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-start',
+        alignContent: 'center',
+        alignItems: 'stretch',
         margin: '5px 2px',
-        fontSize: '13px',
-        padding: '7px',
+        fontSize: '1em',
+        height: '1.5em',
+        padding: 0,
         listStyle: 'none',
-        textAlign: 'center',
         background: '#fff',
-        color: '#333',
-        border: 'solid thin #333',
-        verticalAlign: 'middle',
-        position: 'relative',
-        '& span': {
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          padding: 0,
-          margin: '.5px',
-          lineHeight: '.5em',
+        fontFamily: 'sans-serif',
+        '&.selected-term': {
+          border: 'solid thin #333',
+          borderRadius: 3
+        },
+        '&.message': {
+          fontWeight: 'bold'
+        },
+        '& span.label': {
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          textAlign: 'center',
+          flex: '1 1 auto',
+          padding: [0, '1em'],
+          whitespace: 'nowrap'
+        },
+        '& span.remove': {
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          textAlign: 'center',
+          flex: '0 1 auto',
+          padding: [0, '0.8em'],
+          margin: 0,
           cursor: 'pointer',
-          fontFamily: 'sans-serif'
+          backgroundColor: '#e4e4e4',
+          borderTopRightRadius: 3,
+          borderBottomRightRadius: 3
         }
       }
     }
@@ -186,13 +228,13 @@ function (_Component) {
           value: value['code'],
           name: value['label'],
           onChange: function onChange(e) {
-            return _this.handlechecked(e);
+            return _this.handleChecked(e);
           }
         };
 
         if (assignedTaxo) {
           for (var a = 0; a < assignedTaxo.length; a++) {
-            if (assignedTaxo[a]['code'] == value['code']) {
+            if (assignedTaxo[a]['code'] === value['code']) {
               attr['checked'] = true;
             }
           }
@@ -202,7 +244,7 @@ function (_Component) {
           var item = [],
               clss = 'accordion';
 
-          if (value['type'] == 'volcabulary') {
+          if (value['type'] === 'volcabulary') {
             item.push(React.createElement("strong", null, value['label']));
             item.push(React.createElement("small", null, value['description']));
           } else {
@@ -235,33 +277,45 @@ function (_Component) {
       return taxo;
     };
 
-    _this.handlechecked = function (e) {
-      var selected = _this.state.assignedTaxo;
-      selected.push({
-        code: e.currentTarget.getAttribute('value'),
-        label: e.currentTarget.getAttribute('name')
-      });
+    _this.handleChecked = function (e) {
+      var checkboxElem = e.currentTarget;
+      var selectedTerms = _this.state.assignedTaxo;
+
+      if (checkboxElem.checked) {
+        selectedTerms = [].concat(_toConsumableArray(selectedTerms), [{
+          code: checkboxElem.getAttribute('value'),
+          label: checkboxElem.getAttribute('name')
+        }]);
+      } else {
+        selectedTerms = selectedTerms.filter(function (item) {
+          return item.code !== checkboxElem.getAttribute('value');
+        });
+      }
 
       _this.setState({
-        assignedTaxo: selected
-      });
+        assignedTaxo: selectedTerms
+      }); // var target = document.querySelector(`#${this.props.outputFieldId}`);
 
-      var target = document.querySelector("#".concat(_this.props.outputFieldId));
 
-      if (target) {
-        target.innerHTML = JSON.stringify(selected);
+      var outputFieldElem = document.getElementById(_this.props.outputFieldId);
+
+      if (outputFieldElem) {
+        outputFieldElem.innerHTML = JSON.stringify(selectedTerms);
       }
     };
 
     _this.handleAccordion = function (e) {
-      var target = e.currentTarget;
-      var panel = target.nextElementSibling;
-      target.classList.toggle("active");
+      // Toggle the accordion only if the user didn't click on thecheckbox.
+      if (!e.target.type || e.target.type !== 'checkbox') {
+        var target = e.currentTarget;
+        var panel = target.nextElementSibling;
+        target.classList.toggle("active");
 
-      if (target.classList.contains("active")) {
-        panel.style.display = "block";
-      } else {
-        panel.style.display = "none";
+        if (target.classList.contains("active")) {
+          panel.style.display = "block";
+        } else {
+          panel.style.display = "none";
+        }
       }
     };
 
@@ -270,12 +324,9 @@ function (_Component) {
 
       if (!assignedTaxo) {
         var target = document.querySelector("#".concat(_this.props.outputFieldId));
-        console.log('-1-');
 
         try {
-          console.log('-2-');
           assignedTaxo = JSON.parse(target.innerHTML);
-          console.log('-3-');
 
           _this.setState({
             assignedTaxo: assignedTaxo
@@ -286,23 +337,26 @@ function (_Component) {
 
     _this.parseAssignedTaxonomy = function (taxoTerms) {
       var assignedTaxo = _this.state.assignedTaxo;
+      var tags = [];
 
       if (Array.isArray(assignedTaxo)) {
-        var tags = [];
-
         for (var a = 0; a < assignedTaxo.length; a++) {
           tags.push(React.createElement("li", {
-            key: a
-          }, assignedTaxo[a]['label'], React.createElement("span", {
+            key: a,
+            className: "selected-term"
+          }, React.createElement("span", {
+            className: "label"
+          }, assignedTaxo[a]['label']), React.createElement("span", {
+            className: "remove",
             rel: assignedTaxo[a]['code'],
             onClick: function onClick(e) {
               return _this.removeAssignedTaxonomy(e);
             }
           }, "x")));
         }
-
-        return tags;
       }
+
+      return tags.length > 0 ? tags : null;
     };
 
     _this.removeAssignedTaxonomy = function (e) {
@@ -355,7 +409,11 @@ function (_Component) {
         style: style
       }, assignedDisplayText, React.createElement("ul", {
         className: classes.tags
-      }, this.parseAssignedTaxonomy(taxonomyTerms)), termsDisplayText, this.parseTerms(taxonomyTerms));
+      }, this.parseAssignedTaxonomy(taxonomyTerms) || React.createElement("li", {
+        className: "message"
+      }, "No keywords selected")), termsDisplayText, React.createElement("div", {
+        className: "term-chooser"
+      }, this.parseTerms(taxonomyTerms)));
     }
   }]);
 
@@ -365,8 +423,8 @@ function (_Component) {
 Taxonomy.defaultProps = {
   taxonomyTerms: [],
   outputFieldId: "",
-  termsDisplayText: "Taxonomy terms",
-  assignedDisplayText: "Assigned taxonomies"
+  termsDisplayText: "Choose from the following keywords:",
+  assignedDisplayText: "Selected keywords"
 };
 Taxonomy.propTypes = {
   id: PropTypes.string,
