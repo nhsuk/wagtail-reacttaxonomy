@@ -22,7 +22,7 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
     terms_with_vocab_json = to_json(terms_with_vocab)
 
     blob_service = BlockBlobService(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
-    blob_service.create_blob_from_text(settings.AZURE_ACCOUNT_CONTAINER, f'taxonomy/{instance.taxonomy_id}.json', terms_with_vocab_json)
+    blob_service.create_blob_from_text(settings.AZURE_CONTAINER, f'taxonomy/{instance.taxonomy_id}.json', terms_with_vocab_json)
 
 def get_terms_from_terms_json(data):
     terms = []
