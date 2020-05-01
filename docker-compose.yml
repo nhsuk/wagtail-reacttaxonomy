@@ -3,6 +3,8 @@ version: '3'
 services:
   db:
     image: "postgres:11"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
   web:
@@ -13,10 +15,14 @@ services:
       DB_PORT: "${DB_PORT}"
       DB_USER: "${DB_USER}"
       DB_PASSWORD: "${DB_PASSWORD}"
+      AZURE_ACCOUNT_NAME: ${AZURE_ACCOUNT_NAME}
+      AZURE_ACCOUNT_KEY: ${AZURE_ACCOUNT_KEY}
+      AZURE_CONTAINER: ${AZURE_CONTAINER}
+      INDEXER_TASK_QUEUE_NAME: ${INDEXER_TASK_QUEUE_NAME}
       SITE_ENV: 'Live'
       CMS_ENV: ${CMS_ENV}
     build: .
-    command: bash -c "./scripts/wait-for-it.sh db:5432 -- python3 ./manage.py migrate && python3 ./manage.py runserver 0.0.0.0:8000"
+    command: bash -c "./scripts/wait-for-it.sh db:5432 -- python3 ./manage.py migrate && python3 manage.py load_test_data_fixtures && python3 ./manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
