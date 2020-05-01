@@ -1,4 +1,5 @@
 import json
+import logging
 from django.conf import settings
 
 from azure.storage.file import FileService
@@ -11,6 +12,8 @@ from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+logger = logging.getLogger('django')
+
 class TaxonomyTerms(models.Model):
     taxonomy_id = models.CharField(max_length=255, unique=True)
     terms_json = models.TextField()
@@ -21,8 +24,11 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
     terms_with_vocab = get_terms_from_terms_json(data)
     terms_with_vocab_json = to_json(terms_with_vocab)
 
-    blob_service = BlockBlobService(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
-    blob_service.create_blob_from_text(settings.AZURE_CONTAINER, f'taxonomy/{instance.taxonomy_id}.json', terms_with_vocab_json)
+    try:
+        blob_service = BlockBlobService(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
+        blob_service.create_blob_from_text(settings.AZURE_CONTAINER, f'taxonomy/{instance.taxonomy_id}.json', terms_with_vocab_json)
+    except Exception as e:
+        logger.info('Could not build taxonomy json and send to BlobStore %s', e)
 
 def get_terms_from_terms_json(data):
     terms = []
