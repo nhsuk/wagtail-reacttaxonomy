@@ -31,29 +31,27 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
         logger.info('Could not build taxonomy json and send to BlobStore %s', e)
 
 def get_terms_from_terms_json(data):
-    terms = []
+    terms = dict()
     level = 1
     for obj in data:
-        if obj.get('type') == 'volcabulary':
+        if obj.get('type') == 'vocabulary':
             vocab_code = obj.get('code')
             children = obj.get('children', None)
             if children:
                 child_terms = get_terms_from_children(children, vocab_code, level)
-                for child_term in child_terms:
-                    terms.append(child_term)
+                terms.update(child_terms)
     return terms
 
 def get_terms_from_children(children, vocab_code, level):
-    terms = []
+    terms = dict()
     for obj in children:
         if obj.get('type') == 'term':
-            terms.append({ obj.get('code'): { "label": obj.get('label'), "vocabCode": vocab_code, "level": level } })
+            terms[obj.get('code')] = { "label": obj.get('label'), "vocabCode": vocab_code, "level": level }
             children = obj.get('children', None)
             if children:
                 next_level = level + 1
                 child_terms = get_terms_from_children(children, vocab_code, next_level)
-                for child_term in child_terms:
-                    terms.append(child_term)
+                terms.update(child_term)
     return terms
 
 def to_json(data):

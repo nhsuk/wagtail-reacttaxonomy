@@ -244,7 +244,7 @@ function (_Component) {
           var item = [],
               clss = 'accordion';
 
-          if (value['type'] === 'volcabulary') {
+          if (value['type'] === 'vocabulary') {
             item.push(React.createElement("strong", null, value['label']));
             item.push(React.createElement("small", null, value['description']));
           } else {
