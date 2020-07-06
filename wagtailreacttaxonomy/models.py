@@ -77,3 +77,9 @@ class TaxonomyMixin(models.Model):
 
     class Meta:
         abstract = True
+
+class WithTaxonomyPermissions(models.Model):
+    permissions_json = models.TextField(null=True, blank=True)
+
+    class Meta:
+        abstract = True

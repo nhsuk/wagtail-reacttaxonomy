@@ -20,17 +20,20 @@ How to use
 
 1. Add `TaxonomyMixin` to you wagtail Page model
 2. Add to the page `taxonomy_json` using `TaxonomyPanel`
+2. Optionally add to the page `permissions_json` using `PermissionsPanel`
 
 Example:
 ```python
 class TestPage(Page, TaxonomyMixin):
     taxonomy_panels = [
         TaxonomyPanel('taxonomy_json', taxonomy_terms_id='test_taxonomy'),
+        PermissionsPanel('permissions_json', taxonomy_terms_id='test_permissions_taxonomy'),
     ]
 
     edit_handler = TabbedInterface([
         ObjectList(Page.content_panels, heading='Content'),
         ObjectList(taxonomy_panels, heading='Taxonomy'),
+        ObjectList(permission_panels, heading='Permissions'),
     ])
 ```
 
