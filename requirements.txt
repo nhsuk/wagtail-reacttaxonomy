@@ -1,6 +1,6 @@
 Django>=2.2.0,<2.3
 psycopg2==2.8.2
-wagtail==2.6.1
+wagtail==2.7.4
 python-crontab
 wagtailmedia
 django-cors-headers==2.4.0
