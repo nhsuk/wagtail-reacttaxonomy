@@ -14,3 +14,11 @@
 .term-chooser .accordion:before {
     width: 8px;
 }
+
+.global_permission, .inherit_permission, #id_permissions_json, #permission-terms-json {
+    display: none;
+}
+
+#react-taxonomy-permissions {
+    margin-bottom: 30px;
+}
