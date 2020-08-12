@@ -1,6 +1,6 @@
 from django.db import models
 
-from wagtail.admin.edit_handlers import TabbedInterface, ObjectList
+from wagtail.admin.edit_handlers import FieldPanel, TabbedInterface, ObjectList
 from wagtail.core.models import Page
 
 from wagtailreacttaxonomy.models import TaxonomyMixin, WithTaxonomyPermissions
@@ -13,6 +13,8 @@ class TestPage(Page, TaxonomyMixin, WithTaxonomyPermissions):
     ]
 
     permission_panels = [
+        FieldPanel('global_permission', classname='global_permission'),
+        FieldPanel('inherit_permission', classname='inherit_permission'),
         PermissionsPanel('permissions_json', permission_terms_id='test_permissions_taxonomy'),
     ]
 
