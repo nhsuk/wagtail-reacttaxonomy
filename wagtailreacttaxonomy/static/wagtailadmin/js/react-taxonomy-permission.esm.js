@@ -154,6 +154,18 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
           taxonomyPermissionStore: taxonomyPermissionStore
         });
 
+      case 'REMOVE_ALL_VOCABULARIES':
+        delete taxonomyPermissionStore[action.actionCode][action.groupCode];
+
+        if (Object.keys(taxonomyPermissionStore[action.actionCode]).length === 0) {
+          delete taxonomyPermissionStore[action.actionCode];
+        }
+
+        taxonomyPermissionJson.value = JSON.stringify(taxonomyPermissionStore);
+        return _objectSpread2(_objectSpread2({}, reducerState), {}, {
+          taxonomyPermissionStore: taxonomyPermissionStore
+        });
+
       default:
         throw new Error('Unknown action');
     }
@@ -180,11 +192,20 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
     }
   };
 
+  var removeAllVocabularies = function removeAllVocabularies(actionCode, groupCode) {
+    dispatch({
+      type: 'REMOVE_ALL_VOCABULARIES',
+      actionCode: actionCode,
+      groupCode: groupCode
+    });
+  };
+
   return /*#__PURE__*/React.createElement(Provider, {
     value: {
       state: state,
       action: {
-        updatePermission: updatePermission
+        updatePermission: updatePermission,
+        removeAllVocabularies: removeAllVocabularies
       }
     }
   }, children);
@@ -214,25 +235,71 @@ var useStyles = createUseStyles({
 
 function VocabularyGroup(props) {
   var taxonomyPermissionStore = useTaxonomyContext().state.taxonomyPermissionStore;
-  var updatePermission = useTaxonomyContext().action.updatePermission;
-  var classes = useStyles(); // Use the json string data in the dom to define the default checkbox state
+  var _useTaxonomyContext$a = useTaxonomyContext().action,
+      updatePermission = _useTaxonomyContext$a.updatePermission,
+      removeAllVocabularies = _useTaxonomyContext$a.removeAllVocabularies;
+  var classes = useStyles();
+  var checkedCheckboxesCount = 0; // Use the json string data in the dom to define the default checkbox state
 
   function isChecked(itemCode) {
     if (props.actionCode in taxonomyPermissionStore && props.group.code in taxonomyPermissionStore[props.actionCode]) {
-      return taxonomyPermissionStore[props.actionCode][props.group.code].includes(itemCode);
+      if (taxonomyPermissionStore[props.actionCode][props.group.code].includes(itemCode)) {
+        checkedCheckboxesCount += 1;
+        return true;
+      }
     }
 
     return false;
+  } // Use the json string data in the dom to define the default 'all' checkbox state
+
+
+  function isAllChecked() {
+    if (checkedCheckboxesCount > 0) {
+      return false;
+    }
+
+    return true;
   } // Update json string in the dom when user check/uncheck the checkbox
 
 
   function updateCheckboxPermission(e) {
     updatePermission(props.actionCode, props.group.code, e.target.value, !e.target.checked);
+
+    if (e.target.checked) {
+      checkedCheckboxesCount += 1;
+      document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all")).checked = false;
+    } else {
+      checkedCheckboxesCount -= 1;
+      document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all")).checked = isAllChecked();
+    }
+  } // Update json string in the dom when user check/uncheck the checkbox
+
+
+  function updateCheckboxAllPermission(e) {
+    if (!e.target.checked) {
+      e.target.checked = true;
+      e.preventDefault();
+    } else {
+      props.group.children.forEach(function (item) {
+        document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-").concat(item.code)).checked = false;
+      });
+    }
+
+    removeAllVocabularies(props.actionCode, props.group.code);
   }
 
   return /*#__PURE__*/React.createElement("div", {
     className: classes.vocabularyGroupSection
-  }, /*#__PURE__*/React.createElement("h2", null, props.group.label), /*#__PURE__*/React.createElement("p", null, props.group.description), /*#__PURE__*/React.createElement("ul", null, props.group.children && props.group.children.map(function (item) {
+  }, /*#__PURE__*/React.createElement("h2", null, props.group.label), /*#__PURE__*/React.createElement("p", null, props.group.description), /*#__PURE__*/React.createElement("ul", null, /*#__PURE__*/React.createElement("div", {
+    key: "div-".concat(props.actionCode, "-").concat(props.group.code, "-all")
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: "checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all")
+  }, /*#__PURE__*/React.createElement("input", {
+    id: "checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all"),
+    onChange: updateCheckboxAllPermission,
+    type: "checkbox",
+    defaultChecked: isAllChecked(props.group.code)
+  }), " All")), props.group.children && props.group.children.map(function (item) {
     return /*#__PURE__*/React.createElement("div", {
       key: "div-".concat(props.actionCode, "-").concat(props.group.code, "-").concat(item.code)
     }, /*#__PURE__*/React.createElement("label", {
@@ -420,7 +487,7 @@ function TaxonomyPermissionAction(props) {
     } else {
       vocabularyTags = /*#__PURE__*/React.createElement("li", {
         className: "message"
-      }, "No keywords selected");
+      }, "All");
     }
 
     return /*#__PURE__*/React.createElement("ul", {
@@ -488,7 +555,7 @@ function TaxonomyPermissionPanel(props) {
   var taxonomyPermissionStore = {};
   var errorMessages = [];
   var vocabularyLabels = {};
-  var classes = useStyles$3();
+  var classes = useStyles$3(); // check globalPermissionFieldId exists and get value
 
   if (props.globalPermissionFieldId) {
     if (gloablPermissionField) {
@@ -506,7 +573,8 @@ function TaxonomyPermissionPanel(props) {
       code: "missing-id-".concat(props.globalPermissionFieldId),
       text: 'Missing globalPermissionFieldId'
     });
-  }
+  } // check inheritPermissionFieldId exists and get value
+
 
   if (props.inheritPermissionFieldId) {
     if (inheritPermissionField) {
@@ -524,7 +592,8 @@ function TaxonomyPermissionPanel(props) {
       code: "missing-id-".concat(props.inheritPermissionFieldId),
       text: 'Missing inheritPermissionFieldId'
     });
-  }
+  } // check taxonomyPermissionJsonId exists and get value
+
 
   if (props.taxonomyPermissionJsonId) {
     if (taxonomyPermissionJson) {
@@ -549,7 +618,7 @@ function TaxonomyPermissionPanel(props) {
     group.children.forEach(function (vocabulary) {
       vocabularyLabels[vocabulary.code] = vocabulary.label;
     });
-  }); // Show TaxonomyPermissionAction if restrited permission
+  });
 
   function onChangeGlobalPermission(e) {
     setPermission(e.target.value);
@@ -646,8 +715,6 @@ var vocabularyGroupPropTypes$1 = PropTypes.shape({
 });
 var vocabularyGroupsPropTypes = PropTypes.arrayOf(vocabularyGroupPropTypes$1);
 TaxonomyPermissionPanel.propTypes = {
-  permission: PropTypes.string,
-  inheritPermission: PropTypes.bool,
   globalPermissionFieldId: PropTypes.string,
   inheritPermissionFieldId: PropTypes.string,
   taxonomyPermissionJsonId: PropTypes.string,
@@ -655,8 +722,6 @@ TaxonomyPermissionPanel.propTypes = {
   vocabularyGroups: vocabularyGroupsPropTypes
 };
 TaxonomyPermissionPanel.defaultProps = {
-  permission: 'public',
-  inheritPermission: false,
   globalPermissionFieldId: null,
   inheritPermissionFieldId: null,
   taxonomyPermissionJsonId: null,
