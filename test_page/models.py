@@ -8,11 +8,11 @@ from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
 
 
 class TestPage(Page, TaxonomyMixin, WithTaxonomyPermissions):
-    taxonomy_panels = [
+    taxonomy_term_panels = [
         TaxonomyPanel('taxonomy_json', taxonomy_terms_id='test_taxonomy'),
     ]
 
-    permission_panels = [
+    taxonomy_permission_panels = [
         FieldPanel('global_permission', classname='global_permission'),
         FieldPanel('inherit_permission', classname='inherit_permission'),
         PermissionsPanel('permissions_json', permission_terms_id='test_permissions_taxonomy'),
@@ -21,6 +21,6 @@ class TestPage(Page, TaxonomyMixin, WithTaxonomyPermissions):
 
     edit_handler = TabbedInterface([
         ObjectList(Page.content_panels, heading='Content'),
-        ObjectList(taxonomy_panels, heading='Taxonomy'),
-        ObjectList(permission_panels, heading='Permissions'),
+        ObjectList(taxonomy_term_panels, heading='Taxonomy'),
+        ObjectList(taxonomy_permission_panels, heading='Permissions'),
     ])
