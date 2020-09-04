@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useContext, useState } from 'react';
+import 'react-dom';
 import PropTypes from 'prop-types';
 import { createUseStyles } from 'react-jss';
 
@@ -555,7 +556,8 @@ function TaxonomyPermissionPanel(props) {
   var taxonomyPermissionStore = {};
   var errorMessages = [];
   var vocabularyLabels = {};
-  var classes = useStyles$3(); // check globalPermissionFieldId exists and get value
+  var classes = useStyles$3();
+  var taxonomyPermissionInheritParentLoaded = false; // check globalPermissionFieldId exists and get value
 
   if (props.globalPermissionFieldId) {
     if (gloablPermissionField) {
@@ -631,9 +633,9 @@ function TaxonomyPermissionPanel(props) {
 
   function onChangeInheritPermission(e) {
     if (e.target.checked) {
-      setInheritPermission('parent');
+      setInheritPermission('page');
       inheritPermissionField.checked = true;
-      inheritPermissionField.value = 'parent';
+      inheritPermissionField.value = 'page';
     } else {
       setInheritPermission('none');
       inheritPermissionField.checked = false;
@@ -675,11 +677,18 @@ function TaxonomyPermissionPanel(props) {
     htmlFor: "inheritPermission"
   }, /*#__PURE__*/React.createElement("input", {
     id: "inheritPermission",
-    checked: inheritPermission === 'parent',
+    checked: inheritPermission === 'page',
     onChange: onChangeInheritPermission,
     type: "checkbox",
     name: "global-inherit-permission"
-  }), "Inherit permission from parent"))), permission === 'restricted' && /*#__PURE__*/React.createElement(TaxonomyContext, {
+  }), "Inherit permission from another page")), permission === 'restricted' && inheritPermission === 'page' && props.taxonomyPermissionInheritParent && /*#__PURE__*/React.createElement("div", {
+    ref: function ref(node) {
+      if (!taxonomyPermissionInheritParentLoaded) {
+        node.appendChild(props.taxonomyPermissionInheritParent);
+        taxonomyPermissionInheritParentLoaded = true;
+      }
+    }
+  })), permission === 'restricted' && /*#__PURE__*/React.createElement(TaxonomyContext, {
     value: {
       vocabularyGroups: props.vocabularyGroups,
       taxonomyPermissionJson: taxonomyPermissionJson,
@@ -718,6 +727,7 @@ TaxonomyPermissionPanel.propTypes = {
   globalPermissionFieldId: PropTypes.string,
   inheritPermissionFieldId: PropTypes.string,
   taxonomyPermissionJsonId: PropTypes.string,
+  taxonomyPermissionInheritParent: PropTypes.instanceOf(Element),
   actions: actionsPropTypes,
   vocabularyGroups: vocabularyGroupsPropTypes
 };
@@ -725,6 +735,7 @@ TaxonomyPermissionPanel.defaultProps = {
   globalPermissionFieldId: null,
   inheritPermissionFieldId: null,
   taxonomyPermissionJsonId: null,
+  taxonomyPermissionInheritParent: null,
   actions: [],
   vocabularyGroups: []
 };

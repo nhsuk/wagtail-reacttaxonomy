@@ -26,6 +26,11 @@ window.onload = function (){
   const taxonomyPermissionJson = JSON.parse(taxonomyPermission);
   const actions = taxonomyPermissionJson.actions;
   const vocabularyGroups = taxonomyPermissionJson.vocabularyGroups;
+  let taxonomyPermissionInheritParent = null;
+  if (document.getElementById('id_permission_inherit_page-chooser')) {
+    taxonomyPermissionInheritParent = document.getElementById('id_permission_inherit_page-chooser').closest('.field');
+    taxonomyPermissionInheritParent.closest('.object').style.display = 'none';
+  }
   ReactDOM.render(
     <TaxonomyPermissionPanel
       actions={actions}
@@ -33,6 +38,7 @@ window.onload = function (){
       globalPermissionFieldId="id_global_permission"
       inheritPermissionFieldId="id_inherit_permission"
       taxonomyPermissionJsonId="id_permissions_json"
+      taxonomyPermissionInheritParent={taxonomyPermissionInheritParent}
     />,
     document.getElementById('react-taxonomy-permissions')
   );

@@ -73,14 +73,14 @@ def to_json(data):
     return json.dumps(data)
 
 class TaxonomyMixin(models.Model):
-    global_permission = models.CharField(max_length=100, null=True, blank=True)
-    inherit_permission = models.CharField(max_length=100, null=True, blank=True)
     taxonomy_json = models.TextField(null=True, blank=True)
 
     class Meta:
         abstract = True
 
 class WithTaxonomyPermissions(models.Model):
+    global_permission = models.CharField(max_length=100, null=True, blank=True)
+    inherit_permission = models.CharField(max_length=100, null=True, blank=True)
     permissions_json = models.TextField(null=True, blank=True)
 
     class Meta:

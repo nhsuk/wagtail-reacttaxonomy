@@ -20,14 +20,12 @@ How to use Taxonomy Term Component
 
 1. Add `TaxonomyMixin` to you wagtail Page model
 2. Add to the page `taxonomy_json` using `TaxonomyPanel`
-2. Optionally add to the page `permissions_json` using `PermissionsPanel`
 
 Example:
 ```python
 class TestPage(Page, TaxonomyMixin):
     taxonomy_term_panels = [
         TaxonomyPanel('taxonomy_json', taxonomy_terms_id='test_taxonomy'),
-        PermissionsPanel('permissions_json', taxonomy_terms_id='test_permissions_taxonomy'),
     ]
 
     edit_handler = TabbedInterface([
@@ -39,9 +37,10 @@ class TestPage(Page, TaxonomyMixin):
 How to use Taxonomy Permission Component
 ----------------------------------------
 
-1. Add `TaxonomyMixin` to you wagtail Page model
-2. Add to the page `taxonomy_json` using `TaxonomyPanel`
-2. Optionally add to the page `permissions_json` using `PermissionsPanel`
+1. Add `WithTaxonomyPermissions` to you wagtail Page model
+2. Add to the page `global_permission` using `FieldPanel`
+3. Add to the page `inherit_permission` using `FieldPanel`
+4. Add to the page `permissions_json` using `PermissionsPanel`
 
 Example:
 ```python
@@ -49,8 +48,8 @@ class TestPage(Page, TaxonomyMixin):
     taxonomy_permission_panels = [
         FieldPanel('global_permission', classname='global_permission'),
         FieldPanel('inherit_permission', classname='inherit_permission'),
+        PageChooserPanel('permission_inherit_page'),
         PermissionsPanel('permissions_json', permission_terms_id='test_permissions_taxonomy'),
-
     ]
 
     edit_handler = TabbedInterface([
