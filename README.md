@@ -44,7 +44,7 @@ How to use Taxonomy Permission Component
 
 Example:
 ```python
-class TestPage(Page, TaxonomyMixin):
+class TestPage(Page, WithTaxonomyPermissions):
     taxonomy_permission_panels = [
         FieldPanel('global_permission', classname='global_permission'),
         FieldPanel('inherit_permission', classname='inherit_permission'),
