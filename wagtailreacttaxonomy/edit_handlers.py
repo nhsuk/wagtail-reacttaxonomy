@@ -74,7 +74,7 @@ class PermissionsPanel(FieldPanel):
                 self.permission_terms_error_message = '"Permission Terms" json wrong format'
             permission_terms_json = data.terms_json
         except TaxonomyTerms.DoesNotExist:
-            self.permission_terms_error_message = 'No "Taxonomy Terms" for this id: "{}"'.format(
+            self.permission_terms_error_message = 'No "Permission Terms" for this id: "{}"'.format(
                 self.permission_terms_id
             )
         return permission_terms_json

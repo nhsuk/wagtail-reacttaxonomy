@@ -1,5 +1,4 @@
 import React, { createContext, useReducer, useContext, useState } from 'react';
-import 'react-dom';
 import PropTypes from 'prop-types';
 import { createUseStyles } from 'react-jss';
 
@@ -156,10 +155,12 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
         });
 
       case 'REMOVE_ALL_VOCABULARIES':
-        delete taxonomyPermissionStore[action.actionCode][action.groupCode];
+        if (Object.keys(taxonomyPermissionStore).length !== 0) {
+          delete taxonomyPermissionStore[action.actionCode][action.groupCode];
 
-        if (Object.keys(taxonomyPermissionStore[action.actionCode]).length === 0) {
-          delete taxonomyPermissionStore[action.actionCode];
+          if (Object.keys(taxonomyPermissionStore[action.actionCode]).length === 0) {
+            delete taxonomyPermissionStore[action.actionCode];
+          }
         }
 
         taxonomyPermissionJson.value = JSON.stringify(taxonomyPermissionStore);
@@ -236,6 +237,12 @@ var useStyles = createUseStyles({
 
 function VocabularyGroup(props) {
   var taxonomyPermissionStore = useTaxonomyContext().state.taxonomyPermissionStore;
+
+  var _useState = useState(true),
+      _useState2 = _slicedToArray(_useState, 2),
+      isAllChecked = _useState2[0],
+      setIsAllChecked = _useState2[1];
+
   var _useTaxonomyContext$a = useTaxonomyContext().action,
       updatePermission = _useTaxonomyContext$a.updatePermission,
       removeAllVocabularies = _useTaxonomyContext$a.removeAllVocabularies;
@@ -246,6 +253,11 @@ function VocabularyGroup(props) {
     if (props.actionCode in taxonomyPermissionStore && props.group.code in taxonomyPermissionStore[props.actionCode]) {
       if (taxonomyPermissionStore[props.actionCode][props.group.code].includes(itemCode)) {
         checkedCheckboxesCount += 1;
+
+        if (isAllChecked) {
+          setIsAllChecked(false);
+        }
+
         return true;
       }
     }
@@ -254,12 +266,16 @@ function VocabularyGroup(props) {
   } // Use the json string data in the dom to define the default 'all' checkbox state
 
 
-  function isAllChecked() {
+  function updateAllChecked() {
     if (checkedCheckboxesCount > 0) {
-      return false;
+      if (isAllChecked) {
+        setIsAllChecked(false);
+      }
     }
 
-    return true;
+    if (!isAllChecked) {
+      setIsAllChecked(true);
+    }
   } // Update json string in the dom when user check/uncheck the checkbox
 
 
@@ -268,22 +284,22 @@ function VocabularyGroup(props) {
 
     if (e.target.checked) {
       checkedCheckboxesCount += 1;
-      document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all")).checked = false;
     } else {
       checkedCheckboxesCount -= 1;
-      document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all")).checked = isAllChecked();
     }
+
+    updateAllChecked();
   } // Update json string in the dom when user check/uncheck the checkbox
 
 
   function updateCheckboxAllPermission(e) {
-    if (!e.target.checked) {
-      e.target.checked = true;
+    if (isAllChecked) {
       e.preventDefault();
     } else {
       props.group.children.forEach(function (item) {
         document.getElementById("checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-").concat(item.code)).checked = false;
       });
+      setIsAllChecked(true);
     }
 
     removeAllVocabularies(props.actionCode, props.group.code);
@@ -298,8 +314,8 @@ function VocabularyGroup(props) {
   }, /*#__PURE__*/React.createElement("input", {
     id: "checkbox-".concat(props.actionCode, "-").concat(props.group.code, "-all"),
     onChange: updateCheckboxAllPermission,
-    type: "checkbox",
-    defaultChecked: isAllChecked(props.group.code)
+    checked: isAllChecked,
+    type: "checkbox"
   }), " All")), props.group.children && props.group.children.map(function (item) {
     return /*#__PURE__*/React.createElement("div", {
       key: "div-".concat(props.actionCode, "-").concat(props.group.code, "-").concat(item.code)
