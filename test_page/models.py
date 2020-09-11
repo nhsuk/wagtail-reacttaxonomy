@@ -8,7 +8,7 @@ from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
 
 
 class TestPage(Page, TaxonomyMixin, WithTaxonomyPermissions):
-    permission_inherit_page = models.ForeignKey(
+    parent_permission_page = models.ForeignKey(
         'TestPage',
         null=True,
         blank=True,
@@ -23,7 +23,7 @@ class TestPage(Page, TaxonomyMixin, WithTaxonomyPermissions):
     taxonomy_permission_panels = [
         FieldPanel('global_permission', classname='global_permission'),
         FieldPanel('inherit_permission', classname='inherit_permission'),
-        PageChooserPanel('permission_inherit_page'),
+        PageChooserPanel('parent_permission_page'),
         PermissionsPanel('permissions_json', permission_terms_id='test_permissions_taxonomy'),
     ]
 

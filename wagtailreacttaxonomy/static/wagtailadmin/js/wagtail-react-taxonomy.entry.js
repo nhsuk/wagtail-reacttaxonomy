@@ -27,8 +27,8 @@ window.onload = function (){
   const actions = taxonomyPermissionJson.actions;
   const vocabularyGroups = taxonomyPermissionJson.vocabularyGroups;
   let taxonomyPermissionInheritParent = null;
-  if (document.getElementById('id_permission_inherit_page-chooser')) {
-    taxonomyPermissionInheritParent = document.getElementById('id_permission_inherit_page-chooser').closest('.field');
+  if (document.getElementById('id_parent_permission_page-chooser')) {
+    taxonomyPermissionInheritParent = document.getElementById('id_parent_permission_page-chooser').closest('.field');
     taxonomyPermissionInheritParent.closest('.object').style.display = 'none';
   }
   ReactDOM.render(
