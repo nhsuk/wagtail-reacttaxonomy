@@ -9,6 +9,7 @@ from azure.storage.file.models import File as AzureFile, Directory as AzureDirec
 from azure.storage.blob import BlockBlobService
 
 from django.db import models
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
@@ -94,3 +95,14 @@ class ModelTaxonomyPermissionsMixin(models.Model):
     class Meta:
         abstract = True
 
+# @receiver(pre_save, sender=PageTaxonomyPermissionsMixin)
+def format_permissions_json(sender, instance, **kwargs):
+    permissions_json_formatted = {}
+    permissions_json_formatted = {}
+    for group_key, groups in (json.loads(instance.permissions_json)).items():
+        permissions_json_formatted[group_key] = []
+        for action_key, vocs in groups.items():
+            permissions_json_formatted[group_key].extend(['{0}.{1}'.format(action_key, voc) for voc in vocs])
+    instance.permissions_json_formatted = permissions_json_formatted
+    print(permissions_json_formatted)
+    return instance

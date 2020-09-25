@@ -1,9 +1,10 @@
 from django.db import models
+from django.db.models.signals import pre_save
 
 from wagtail.admin.edit_handlers import FieldPanel, TabbedInterface, ObjectList, PageChooserPanel
 from wagtail.core.models import Page
 
-from wagtailreacttaxonomy.models import TaxonomyMixin, PageTaxonomyPermissionsMixin, ModelTaxonomyPermissionsMixin
+from wagtailreacttaxonomy.models import TaxonomyMixin, PageTaxonomyPermissionsMixin, ModelTaxonomyPermissionsMixin, format_permissions_json
 from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
 
 
@@ -39,6 +40,8 @@ class TestPage(Page, TaxonomyMixin, PageTaxonomyPermissionsMixin):
         ObjectList(taxonomy_permission_panels, heading='Permissions'),
     ])
 
+pre_save.connect(format_permissions_json, sender=TestPage)
+
 class TestModel(ModelTaxonomyPermissionsMixin):
     panels = [
         PermissionsPanel(
@@ -53,3 +56,4 @@ class TestModel(ModelTaxonomyPermissionsMixin):
     def __str__(self):
         return 'TestModel - {0}'.format(self.id)
 
+pre_save.connect(format_permissions_json, sender=TestModel)
