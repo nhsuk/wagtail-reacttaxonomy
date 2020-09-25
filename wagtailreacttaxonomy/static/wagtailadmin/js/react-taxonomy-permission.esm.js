@@ -126,6 +126,10 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
         taxonomyPermissionStore[action.actionCode] = taxonomyPermissionStore[action.actionCode] || {};
         taxonomyPermissionStore[action.actionCode][action.groupCode] = taxonomyPermissionStore[action.actionCode][action.groupCode] || [];
 
+        if (taxonomyPermissionStore[action.actionCode][action.groupCode].length === 1 && taxonomyPermissionStore[action.actionCode][action.groupCode][0] === '_all') {
+          taxonomyPermissionStore[action.actionCode][action.groupCode] = [];
+        }
+
         if (taxonomyPermissionStore[action.actionCode][action.groupCode].indexOf(action.item) === -1) {
           taxonomyPermissionStore[action.actionCode][action.groupCode].push(action.item);
         }
@@ -142,11 +146,7 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
         });
 
         if (taxonomyPermissionStore[action.actionCode][action.groupCode].length === 0) {
-          delete taxonomyPermissionStore[action.actionCode][action.groupCode];
-        }
-
-        if (Object.keys(taxonomyPermissionStore[action.actionCode]).length === 0) {
-          delete taxonomyPermissionStore[action.actionCode];
+          taxonomyPermissionStore[action.actionCode][action.groupCode] = ['_all'];
         }
 
         taxonomyPermissionJson.value = JSON.stringify(taxonomyPermissionStore);
@@ -155,14 +155,7 @@ var TaxonomyContext = function TaxonomyContext(_ref) {
         });
 
       case 'REMOVE_ALL_VOCABULARIES':
-        if (Object.keys(taxonomyPermissionStore).length !== 0) {
-          delete taxonomyPermissionStore[action.actionCode][action.groupCode];
-
-          if (Object.keys(taxonomyPermissionStore[action.actionCode]).length === 0) {
-            delete taxonomyPermissionStore[action.actionCode];
-          }
-        }
-
+        taxonomyPermissionStore[action.actionCode][action.groupCode] = ['_all'];
         taxonomyPermissionJson.value = JSON.stringify(taxonomyPermissionStore);
         return _objectSpread2(_objectSpread2({}, reducerState), {}, {
           taxonomyPermissionStore: taxonomyPermissionStore
@@ -487,7 +480,9 @@ function TaxonomyPermissionAction(props) {
 
     if (actionId in taxonomyPermissionStore && groupId in taxonomyPermissionStore[actionId]) {
       var values = taxonomyPermissionStore[actionId][groupId];
-      values.forEach(function (value) {
+      values.filter(function (val) {
+        return val !== '_all';
+      }).forEach(function (value) {
         valueLabels.push(vocabularyLabels[value]);
       });
     }
@@ -569,47 +564,64 @@ function TaxonomyPermissionPanel(props) {
   var gloablPermissionField = document.getElementById(props.globalPermissionFieldId);
   var inheritPermissionField = document.getElementById(props.inheritPermissionFieldId);
   var taxonomyPermissionJson = document.getElementById(props.taxonomyPermissionJsonId);
+  var actions = props.actions.filter(function (action) {
+    return props.permissionActions.includes(action.code);
+  });
   var taxonomyPermissionStore = {};
   var errorMessages = [];
   var vocabularyLabels = {};
   var classes = useStyles$3();
-  var taxonomyPermissionInheritParentLoaded = false; // check globalPermissionFieldId exists and get value
 
-  if (props.globalPermissionFieldId) {
-    if (gloablPermissionField) {
-      if (gloablPermissionField.value && !permission) {
-        setPermission(gloablPermissionField.value);
+  var _useState5 = useState(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      taxonomyPermissionInheritPageLoaded = _useState6[0],
+      setTaxonomyPermissionInheritPageLoaded = _useState6[1];
+
+  var _useState7 = useState(null),
+      _useState8 = _slicedToArray(_useState7, 2),
+      taxonomyPermissionInheritPageField = _useState8[0],
+      setTaxonomyPermissionInheritPageField = _useState8[1];
+
+  if (props.permissionType === 'page') {
+    // check globalPermissionFieldId exists and get value
+    if (props.globalPermissionFieldId) {
+      if (gloablPermissionField) {
+        if (gloablPermissionField.value && !permission) {
+          setPermission(gloablPermissionField.value);
+        }
+      } else {
+        errorMessages.push({
+          code: "missing-elt-".concat(props.globalPermissionFieldId),
+          text: "Missing element id: ".concat(props.globalPermissionFieldId)
+        });
       }
     } else {
       errorMessages.push({
-        code: "missing-elt-".concat(props.globalPermissionFieldId),
-        text: "Missing element id: ".concat(props.globalPermissionFieldId)
+        code: "missing-id-".concat(props.globalPermissionFieldId),
+        text: 'Missing globalPermissionFieldId'
       });
-    }
-  } else {
-    errorMessages.push({
-      code: "missing-id-".concat(props.globalPermissionFieldId),
-      text: 'Missing globalPermissionFieldId'
-    });
-  } // check inheritPermissionFieldId exists and get value
+    } // check inheritPermissionFieldId exists and get value
 
 
-  if (props.inheritPermissionFieldId) {
-    if (inheritPermissionField) {
-      if (inheritPermissionField.value && !inheritPermission) {
-        setInheritPermission(inheritPermissionField.value);
+    if (!taxonomyPermissionInheritPageLoaded) {
+      if (props.inheritPermissionFieldId) {
+        if (inheritPermissionField) {
+          if (inheritPermissionField.value && !inheritPermission) {
+            setInheritPermission(inheritPermissionField.value);
+          }
+        } else {
+          errorMessages.push({
+            code: "missing-elt-".concat(props.inheritPermissionFieldId),
+            text: "Missing element id: ".concat(props.inheritPermissionFieldId)
+          });
+        }
+      } else {
+        errorMessages.push({
+          code: "missing-id-".concat(props.inheritPermissionFieldId),
+          text: 'Missing inheritPermissionFieldId'
+        });
       }
-    } else {
-      errorMessages.push({
-        code: "missing-elt-".concat(props.inheritPermissionFieldId),
-        text: "Missing element id: ".concat(props.inheritPermissionFieldId)
-      });
     }
-  } else {
-    errorMessages.push({
-      code: "missing-id-".concat(props.inheritPermissionFieldId),
-      text: 'Missing inheritPermissionFieldId'
-    });
   } // check taxonomyPermissionJsonId exists and get value
 
 
@@ -636,7 +648,20 @@ function TaxonomyPermissionPanel(props) {
     group.children.forEach(function (vocabulary) {
       vocabularyLabels[vocabulary.code] = vocabulary.label;
     });
+  }); // init taxonomyPermissionJson
+
+  actions.forEach(function (action) {
+    if (!(action.code in taxonomyPermissionStore)) {
+      taxonomyPermissionStore[action.code] = {};
+    }
+
+    props.vocabularyGroups.forEach(function (group) {
+      if (!(group.code in taxonomyPermissionStore[action.code])) {
+        taxonomyPermissionStore[action.code][group.code] = ['_all'];
+      }
+    });
   });
+  taxonomyPermissionJson.value = JSON.stringify(taxonomyPermissionStore);
 
   function onChangeGlobalPermission(e) {
     setPermission(e.target.value);
@@ -665,7 +690,7 @@ function TaxonomyPermissionPanel(props) {
     return /*#__PURE__*/React.createElement("li", {
       key: msg.code
     }, msg.text);
-  })), errorMessages.length === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("p", null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."), /*#__PURE__*/React.createElement("div", {
+  })), errorMessages.length === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, props.permissionType === 'page' && /*#__PURE__*/React.createElement("p", null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."), props.permissionType === 'model' && /*#__PURE__*/React.createElement("p", null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."), props.permissionType === 'page' && /*#__PURE__*/React.createElement("div", {
     className: classes.globalPermissionsPanel
   }, /*#__PURE__*/React.createElement("label", {
     htmlFor: "radio_global_permission"
@@ -697,21 +722,26 @@ function TaxonomyPermissionPanel(props) {
     onChange: onChangeInheritPermission,
     type: "checkbox",
     name: "global-inherit-permission"
-  }), "Inherit permission from another page")), permission === 'restricted' && inheritPermission === 'page' && props.taxonomyPermissionInheritParent && /*#__PURE__*/React.createElement("div", {
+  }), "Inherit permission from another page")), permission === 'restricted' && inheritPermission === 'page' && props.taxonomyPermissionInheritPage && /*#__PURE__*/React.createElement("div", {
     ref: function ref(node) {
-      if (!taxonomyPermissionInheritParentLoaded) {
-        node.appendChild(props.taxonomyPermissionInheritParent);
-        taxonomyPermissionInheritParentLoaded = true;
+      if (node) {
+        node.appendChild(props.taxonomyPermissionInheritPage);
+        setTaxonomyPermissionInheritPageField(node);
+        setTaxonomyPermissionInheritPageLoaded(true);
+      }
+
+      if (taxonomyPermissionInheritPageField) {
+        taxonomyPermissionInheritPageField.appendChild(props.taxonomyPermissionInheritPage);
       }
     }
-  })), permission === 'restricted' && /*#__PURE__*/React.createElement(TaxonomyContext, {
+  })), (permission === 'restricted' || props.permissionType === 'model') && /*#__PURE__*/React.createElement(TaxonomyContext, {
     value: {
       vocabularyGroups: props.vocabularyGroups,
       taxonomyPermissionJson: taxonomyPermissionJson,
       vocabularyLabels: vocabularyLabels,
       taxonomyPermissionStore: taxonomyPermissionStore
     }
-  }, props.actions && props.actions.map(function (action) {
+  }, props.actions && actions.map(function (action) {
     return /*#__PURE__*/React.createElement(TaxonomyPermissionAction, {
       key: "action-".concat(action.code),
       action: action
@@ -743,17 +773,21 @@ TaxonomyPermissionPanel.propTypes = {
   globalPermissionFieldId: PropTypes.string,
   inheritPermissionFieldId: PropTypes.string,
   taxonomyPermissionJsonId: PropTypes.string,
-  taxonomyPermissionInheritParent: PropTypes.instanceOf(Element),
+  taxonomyPermissionInheritPage: PropTypes.instanceOf(Element),
   actions: actionsPropTypes,
-  vocabularyGroups: vocabularyGroupsPropTypes
+  vocabularyGroups: vocabularyGroupsPropTypes,
+  permissionType: PropTypes.string,
+  permissionActions: PropTypes.arrayOf(PropTypes.string)
 };
 TaxonomyPermissionPanel.defaultProps = {
   globalPermissionFieldId: null,
   inheritPermissionFieldId: null,
   taxonomyPermissionJsonId: null,
-  taxonomyPermissionInheritParent: null,
+  taxonomyPermissionInheritPage: null,
   actions: [],
-  vocabularyGroups: []
+  vocabularyGroups: [],
+  permissionType: 'page',
+  permissionActions: []
 };
 
 export { TaxonomyPermissionPanel };
