@@ -78,10 +78,19 @@ class TaxonomyMixin(models.Model):
     class Meta:
         abstract = True
 
-class WithTaxonomyPermissions(models.Model):
-    global_permission = models.CharField(max_length=100, null=True, blank=True)
+class PageTaxonomyPermissionsMixin(models.Model):
+    global_permission = models.CharField(max_length=100, null=True, blank=True, default='public')
     inherit_permission = models.CharField(max_length=100, null=True, blank=True)
     permissions_json = models.TextField(null=True, blank=True)
+    permissions_json_formatted = models.TextField(null=True, blank=True)
 
     class Meta:
         abstract = True
+
+class ModelTaxonomyPermissionsMixin(models.Model):
+    permissions_json = models.TextField(null=True, blank=True)
+    permissions_json_formatted = models.TextField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+

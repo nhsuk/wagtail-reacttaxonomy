@@ -62,6 +62,8 @@ class PermissionsPanel(FieldPanel):
             'field': self.bound_field,
             'permission_terms_json': self.load_permission_terms(),
             'permission_terms_error_message': self.permission_terms_error_message,
+            'permission_actions': json.dumps(self.permission_actions),
+            'permission_type': self.permission_type,
         }))
     
     def load_permission_terms(self):
@@ -79,9 +81,11 @@ class PermissionsPanel(FieldPanel):
             )
         return permission_terms_json
     
-    def __init__(self, field_name, permission_terms_id, *args, **kwargs):
+    def __init__(self, field_name, permission_terms_id, permission_actions, permission_type, *args, **kwargs):
         super().__init__(field_name, *args, **kwargs)
         self.permission_terms_id = permission_terms_id
+        self.permission_actions = permission_actions
+        self.permission_type = permission_type
         self.permission_terms_error_message = None
 
     def clone_kwargs(self):
@@ -89,6 +93,8 @@ class PermissionsPanel(FieldPanel):
         kwargs.update(
             field_name=self.field_name,
             permission_terms_id=self.permission_terms_id,
+            permission_actions=self.permission_actions,
+            permission_type=self.permission_type,
             widget=self.widget if hasattr(self, 'widget') else None,
         )
         return kwargs
