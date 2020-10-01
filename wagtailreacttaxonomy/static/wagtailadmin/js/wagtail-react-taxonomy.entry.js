@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { ThemeProvider } from 'react-jss';
 
-// import Taxonomy from './react-taxonomy.esm.js';
+import Taxonomy from './react-taxonomy.esm.js';
 import { TaxonomyPermissionPanel } from './react-taxonomy-permission.esm.js';
 
 window.onload = function (){
