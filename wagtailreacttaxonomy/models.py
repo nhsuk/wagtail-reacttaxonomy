@@ -58,7 +58,7 @@ def get_terms_from_children(children, vocab_code, level):
             if children:
                 next_level = level + 1
                 child_terms = get_terms_from_children(children, vocab_code, next_level)
-                terms.update(child_term)
+                terms.update(child_terms)
     return terms
 
 def get_vocabs_from_terms_json(data):
