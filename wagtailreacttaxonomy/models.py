@@ -54,7 +54,7 @@ def get_terms_from_children(children, vocab_code, index_path, level):
     for obj in children:
         if obj.get('type') == 'term':
             index_path_for_level = obj.get('code') if index_path == '' else "%s|%s" % (index_path, obj.get('code'))
-            terms[obj.get('code')] = { "label": obj.get('label'), "vocabCode": vocab_code, "indexPath": index_path_for_level, "level": level }
+            terms[index_path_for_level] = { "label": obj.get('label'), "vocabCode": vocab_code, "indexPath": index_path_for_level, "level": level }
             children = obj.get('children', None)
             if children:
                 next_level = level + 1
