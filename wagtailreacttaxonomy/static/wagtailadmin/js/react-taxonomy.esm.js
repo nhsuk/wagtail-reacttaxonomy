@@ -268,7 +268,7 @@ function (_Component) {
           terms.push(React.createElement("div", {
             key: i,
             className: "term"
-          }, React.createElement("input", attr), React.createElement("label", null, value['label'])));
+          }, React.createElement("input", attr), React.createElement("label", null, value['code'])));
         }
 
         taxo.push(terms);
