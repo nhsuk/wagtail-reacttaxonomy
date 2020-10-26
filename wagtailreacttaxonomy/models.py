@@ -45,19 +45,20 @@ def get_terms_from_terms_json(data):
             vocab_code = obj.get('code')
             children = obj.get('children', None)
             if children:
-                child_terms = get_terms_from_children(children, vocab_code, level)
+                child_terms = get_terms_from_children(children, vocab_code, '', level)
                 terms.update(child_terms)
     return terms
 
-def get_terms_from_children(children, vocab_code, level):
+def get_terms_from_children(children, vocab_code, index_path, level):
     terms = dict()
     for obj in children:
         if obj.get('type') == 'term':
-            terms[obj.get('code')] = { "label": obj.get('label'), "vocabCode": vocab_code, "level": level }
+            index_path_for_level = obj.get('code') if index_path == '' else "%s|%s" % (index_path, obj.get('code'))
+            terms[obj.get('code')] = { "label": obj.get('label'), "vocabCode": vocab_code, "indexPath": index_path_for_level, "level": level }
             children = obj.get('children', None)
             if children:
                 next_level = level + 1
-                child_terms = get_terms_from_children(children, vocab_code, next_level)
+                child_terms = get_terms_from_children(children, vocab_code, index_path_for_level, next_level)
                 terms.update(child_terms)
     return terms
 
