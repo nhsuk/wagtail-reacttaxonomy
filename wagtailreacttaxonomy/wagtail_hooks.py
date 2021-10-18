@@ -29,7 +29,7 @@ def add_wagtail_react_taxonomy_css():
 @hooks.register('insert_editor_js')
 def add_wagtail_react_taxonomy_js():
     js_files = [
-        '/wagtailadmin/js/wagtail-react-taxonomy.js',
+        'wagtailadmin/js/wagtail-react-taxonomy.js',
     ]
     js_includes = format_html_join('\n', '<script src="{0}"></script>',
         ((static(filename),) for filename in js_files)
