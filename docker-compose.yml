@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/db:/var/lib/postgresql/data
   web:
     environment:
       HAY_DEBUG: "True"
@@ -26,7 +26,7 @@ services:
     build: .
     command: bash -c "./scripts/wait-for-it.sh db:5432 -- python3 ./manage.py migrate && python3 manage.py load_test_data_fixtures && python3 ./manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/code
+      - ${LOCAL_WORKSPACE_FOLDER:-.}:/code
     ports:
       - "8000:8000"
     depends_on:

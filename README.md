@@ -99,26 +99,46 @@ pre_save.connect(format_permissions_json, sender=TestModel)
 How to contribute
 -----------------
 
-### Requirements
+### Getting started
+
+#### With devcontainer and VSCode (recommended)
+
+* Open repository folder in container
+
+#### Build locally (old school)
+
+##### Requirements
 * Docker
 * docker-compose
 You'll get all this lot installed nicely with (https://docs.docker.com/docker-for-mac/install).
 
-
-### Setup locally
-Add git hook
+##### Add git hook
 ```
 ./scripts/install-hooks.sh
 ```
-Build the image
+
+### Now you are set
+
+#### Build the containers
 ```
 docker-compose build
 ```
-Run the containers
+#### Create super user
+```
+docker-compose run --rm web python manage.py createsuperuser
+```
+#### Exercise the application
+
+##### Run the containers
+
 ```
 docker-compose up
 ```
-Create super user:
+
+##### Browse to http://localhost:8000/admin and make your changes with live reload
+
+#### Run tests as required
+
 ```
-docker-compose run --rm web python manage.py createsuperuser
+docker-compose run --rm web python manage.py test
 ```
