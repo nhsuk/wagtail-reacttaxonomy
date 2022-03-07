@@ -6,7 +6,7 @@ from azure.storage.file import FileService
 from azure.common import AzureMissingResourceHttpError
 from azure.storage.file.models import File as AzureFile, Directory as AzureDirectory
 
-from azure.storage.blob import BlockBlobService
+from azure.storage.blob import BlobServiceClient
 
 from django.db import models
 from django.db.models.signals import pre_save
@@ -30,7 +30,7 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
         content['terms'] = terms_with_vocab
 
         blobPath = f'taxonomy/{instance.taxonomy_id}.json'
-        blob_service = BlockBlobService(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
+        blob_service = BlobServiceClient(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
         blob_service.create_blob_from_text(settings.AZURE_CONTAINER, blobPath, to_json(content))
         logger.info('Successfully wrote taxonomy json to BlobStore %s', blobPath)
 
