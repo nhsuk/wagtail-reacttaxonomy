@@ -27,7 +27,7 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
         content['terms'] = terms_with_vocab
 
         blobPath = f'taxonomy/{instance.taxonomy_id}.json'
-        blobFile = ContentFile (to_json (content))
+        blobFile = ContentFile (to_json (content).encode ())
         default_storage.save (blobPath, blobFile)
         logger.info('Successfully wrote taxonomy json to BlobStore %s', blobPath)
 
