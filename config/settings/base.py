@@ -183,12 +183,6 @@ BASE_URL = 'http://example.com'
 # WAGTAILIMAGES_IMAGE_MODEL = 'wagtailapiimagerendition.CustomImage'
 WAGTAIL_USAGE_COUNT_ENABLED = True
 
-# DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
-AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME')    # eg. 'campaignstorage'
-AZURE_ACCOUNT_KEY = os.environ.get('AZURE_ACCOUNT_KEY')      # eg. '<secret key>'
-AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER')          # eg. 'campaign-resource-centre'
-AZURE_FILE_SHARE = os.environ.get('AZURE_FILE_SHARE')
-
 ENV = os.environ.get('CMS_ENV', 'local')
 
 # INITIALIZER = os.environ.get('INITIALIZER', False)

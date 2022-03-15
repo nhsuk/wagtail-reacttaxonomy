@@ -2,11 +2,8 @@ import json
 import logging
 from django.conf import settings
 
-from azure.storage.file import FileService
-from azure.common import AzureMissingResourceHttpError
-from azure.storage.file.models import File as AzureFile, Directory as AzureDirectory
-
-from azure.storage.blob import BlobServiceClient
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 from django.db import models
 from django.db.models.signals import pre_save
@@ -30,12 +27,13 @@ def update_taxonomy_terms_on_blobstore(sender, instance, **kwargs):
         content['terms'] = terms_with_vocab
 
         blobPath = f'taxonomy/{instance.taxonomy_id}.json'
-        blob_service = BlobServiceClient(account_name=settings.AZURE_ACCOUNT_NAME, account_key=settings.AZURE_ACCOUNT_KEY)
-        blob_service.create_blob_from_text(settings.AZURE_CONTAINER, blobPath, to_json(content))
+        blobFile = ContentFile (to_json (content))
+        default_storage.save (blobPath, blobFile)
         logger.info('Successfully wrote taxonomy json to BlobStore %s', blobPath)
 
     except Exception as e:
         logger.info('Could not build taxonomy json and send to BlobStore %s', e)
+        raise
 
 def get_terms_from_terms_json(data):
     terms = dict()
@@ -105,5 +103,4 @@ def format_permissions_json(sender, instance, **kwargs):
         for action_key, vocs in groups.items():
             permissions_json_formatted[group_key].extend(['{0}.{1}'.format(action_key, voc) for voc in vocs])
     instance.permissions_json_formatted = permissions_json_formatted
-    print(permissions_json_formatted)
     return instance

@@ -15,6 +15,20 @@ INSTALLED_APPS = [
 ]
 ```
 
+Useful Imports
+--------------
+```python
+from django.db import models
+from django.db.models.signals import pre_save
+
+from wagtail.admin.edit_handlers import FieldPanel, TabbedInterface, ObjectList, PageChooserPanel
+from wagtail.core.models import Page
+
+from wagtailreacttaxonomy.models import TaxonomyMixin, PageTaxonomyPermissionsMixin,\
+    ModelTaxonomyPermissionsMixin, format_permissions_json
+from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
+```
+
 How to use Taxonomy Term Component
 ----------------------------------
 
@@ -110,34 +124,38 @@ How to contribute
 ##### Requirements
 * Docker
 * docker-compose
-You'll get all this lot installed nicely with (https://docs.docker.com/docker-for-mac/install).
 
-##### Add git hook
+You'll get all this lot installed nicely with https://docs.docker.com/docker-for-mac/install.
+
+### Add git hook
 ```
 ./scripts/install-hooks.sh
 ```
+Now you are set
 
-### Now you are set
-
-#### Build the containers
+### Build the containers
 ```
 docker-compose build
 ```
-#### Create super user
+### Create super user
 ```
 docker-compose run --rm web python manage.py createsuperuser
 ```
-#### Exercise the application
+### Exercise the application
 
-##### Run the containers
-
+#### Run the containers
 ```
 docker-compose up
 ```
 
-##### Browse to http://localhost:8000/admin and make your changes with live reload
+#### Browse to http://localhost:8000/admin and make your changes with live reload
 
-#### Run tests as required
+1. Log in as superuser
+1. You will see a Taxonomy Terms entry in the admin menu
+1. Use this entry to upload and save the JSON text of your taxonomy
+1. Taxonomies are stored in your Django media folder (media in the test configuration)
+
+### Run tests as required
 
 ```
 docker-compose run --rm web python manage.py test
