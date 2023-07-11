@@ -3,7 +3,7 @@ import json
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from wagtail.admin.edit_handlers import FieldPanel
+from wagtail.admin.panels import FieldPanel
 
 from .models import TaxonomyTerms
 

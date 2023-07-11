@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models.signals import pre_save
 
-from wagtail.admin.edit_handlers import FieldPanel, TabbedInterface, ObjectList, PageChooserPanel
-from wagtail.core.models import Page
+from wagtail.admin.panels import FieldPanel, TabbedInterface, ObjectList, PageChooserPanel
+from wagtail.models import Page
 
 from wagtailreacttaxonomy.models import TaxonomyMixin, PageTaxonomyPermissionsMixin, ModelTaxonomyPermissionsMixin, format_permissions_json
 from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
