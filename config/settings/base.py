@@ -178,7 +178,7 @@ SITE_ENV = os.environ.get('SITE_ENV', 'db')
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
-BASE_URL = 'http://example.com'
+WAGTAILADMIN_BASE_URL = 'http://example.com'
 
 # WAGTAILIMAGES_IMAGE_MODEL = 'wagtailapiimagerendition.CustomImage'
 WAGTAIL_USAGE_COUNT_ENABLED = True
