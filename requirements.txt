@@ -1,6 +1,6 @@
 Django~=4.0
 wagtail~=3.0
-psycopg2>=2.8,<2.9
+psycopg2-binary>=<2.9.6 
 python-crontab>=2.5,<2.6
 django-cors-headers>=3.5,<3.6
 django-storages~=1.12
