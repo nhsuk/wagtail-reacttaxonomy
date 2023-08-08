@@ -5,7 +5,7 @@ from wagtail.admin.panels import FieldPanel, TabbedInterface, ObjectList, PageCh
 from wagtail.models import Page
 
 from wagtailreacttaxonomy.models import TaxonomyMixin, PageTaxonomyPermissionsMixin, ModelTaxonomyPermissionsMixin, format_permissions_json
-from wagtailreacttaxonomy.edit_handlers import TaxonomyPanel, PermissionsPanel
+from wagtailreacttaxonomy.panels import TaxonomyPanel, PermissionsPanel
 
 
 class TestPage(Page, TaxonomyMixin, PageTaxonomyPermissionsMixin):

@@ -23,11 +23,11 @@ class Command(BaseCommand):
         self.no_output = options['no_output']
 
         User = get_user_model()
-        username = os.environ.get('CMS_SUPERUSER_USERNAME', 'superadmin')
+        username = os.environ.get('CMS_SUPERUSER_USERNAME', 'admin')
         if not User.objects.filter(username=username).exists():
             # Create superuser
             self.stdout.write('1 - Create superuser')
-            password = os.environ.get('CMS_SUPERUSER_PASSWORD', 'superpassword')
+            password = os.environ.get('CMS_SUPERUSER_PASSWORD', 'admin')
             superuser = User.objects.create_superuser(username, None, password, id=8)
             self.stdout.write(self.style.SUCCESS('DONE'))
 

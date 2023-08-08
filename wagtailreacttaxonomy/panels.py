@@ -9,8 +9,8 @@ from .models import TaxonomyTerms
 
 
 class TaxonomyPanel(FieldPanel):
-    object_template = "wagtailadmin/edit_handlers/taxonomy_panel.html"
-    field_template = "wagtailadmin/edit_handlers/taxonomy_panel.html"
+    object_template = "wagtailadmin/panels/taxonomy_panel.html"
+    field_template = "wagtailadmin/panels/taxonomy_panel.html"
 
     def render_as_object(self):
         return mark_safe(render_to_string(self.object_template, {
@@ -52,8 +52,8 @@ class TaxonomyPanel(FieldPanel):
 
 
 class PermissionsPanel(FieldPanel):
-    object_template = "wagtailadmin/edit_handlers/permissions_panel.html"
-    field_template = "wagtailadmin/edit_handlers/permissions_panel.html"
+    object_template = "wagtailadmin/panels/permissions_panel.html"
+    field_template = "wagtailadmin/panels/permissions_panel.html"
 
     def render_as_object(self):
         return mark_safe(render_to_string(self.object_template, {
