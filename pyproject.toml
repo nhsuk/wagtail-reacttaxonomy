@@ -14,9 +14,9 @@ description = "Add React Taxonomy component to a wagtail page and store it as a 
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
-    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 4.0",
     "Framework :: Wagtail",
-    "Framework :: Wagtail :: 2",
+    "Framework :: Wagtail :: 3",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",

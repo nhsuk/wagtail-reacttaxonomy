@@ -38,3 +38,4 @@ class Command(BaseCommand):
             except Page.DoesNotExist:
                 pass
             self.stdout.write(self.style.SUCCESS('DONE'))
+            self.stdout.write(self.style.NOTICE('run python3 ./manage.py fixtree'))
