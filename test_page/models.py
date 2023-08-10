@@ -56,4 +56,15 @@ class TestModel(ModelTaxonomyPermissionsMixin):
     def __str__(self):
         return 'TestModel - {0}'.format(self.id)
 
+class TaxTestPage(Page, TaxonomyMixin):
+
+    taxonomy_term_panels = [
+        TaxonomyPanel('taxonomy_json', taxonomy_terms_id='test_taxonomy'),
+    ]
+
+    edit_handler = TabbedInterface([
+        ObjectList(Page.content_panels, heading='Content'),
+        ObjectList(taxonomy_term_panels, heading='Taxonomy'),
+    ])
+
 pre_save.connect(format_permissions_json, sender=TestModel)

@@ -83,34 +83,6 @@ class TaxonomyPanel(FieldPanel):
 
 
 class PermissionsPanel(FieldPanel):
-    object_template = "wagtailadmin/panels/permissions_panel.html"
-    field_template = "wagtailadmin/panels/permissions_panel.html"
-
-    def render_as_object(self):
-        return mark_safe(render_to_string(self.object_template, {
-            'self': self,
-            self.TEMPLATE_VAR: self,
-            'field': self.bound_field,
-            'permission_terms_json': self.load_permission_terms(),
-            'permission_terms_error_message': self.permission_terms_error_message,
-            'permission_actions': json.dumps(self.permission_actions),
-            'permission_type': self.permission_type,
-        }))
-    
-    def load_permission_terms(self):
-        permission_terms_json = None
-        try:
-            data = TaxonomyTerms.objects.get(taxonomy_id=self.permission_terms_id)
-            try:
-                json.loads(data.terms_json)
-            except json.decoder.JSONDecodeError:
-                self.permission_terms_error_message = '"Permission Terms" json wrong format'
-            permission_terms_json = data.terms_json
-        except TaxonomyTerms.DoesNotExist:
-            self.permission_terms_error_message = 'No "Permission Terms" for this id: "{}"'.format(
-                self.permission_terms_id
-            )
-        return permission_terms_json
     
     def __init__(self, field_name, permission_terms_id, permission_actions, permission_type, *args, **kwargs):
         super().__init__(field_name, *args, **kwargs)
@@ -129,3 +101,56 @@ class PermissionsPanel(FieldPanel):
             widget=self.widget if hasattr(self, 'widget') else None,
         )
         return kwargs
+
+    def get_bound_panel(self, instance=None, request=None, form=None ):
+        if self.model is None:
+            raise ImproperlyConfigured(
+                "%s.bind_to_model(model) must be called before get_bound_panel"
+                % type(self).__name__
+            )
+
+        if not issubclass(self.BoundPanel, EditHandler.BoundPanel):
+            raise ImproperlyConfigured(
+                "%s.BoundPanel must be a subclass of EditHandler.BoundPanel"
+                % type(self).__name__
+            )
+
+        return self.BoundPanel(
+            panel=self, instance=instance, request=request, form=form
+        )
+
+    class BoundPanel(FieldPanel.BoundPanel):
+
+        object_template = "wagtailadmin/panels/permissions_panel.html"
+        field_template = "wagtailadmin/panels/permissions_panel.html"
+
+        def render_as_object(self):
+            return mark_safe(render_to_string(self.object_template, {
+                'self': self,
+                self.panel.TEMPLATE_VAR: self,
+                'field': self.bound_field,
+                'permission_terms_json': self.load_permission_terms(),
+                'permission_terms_error_message': self.permission_terms_error_message,
+                'permission_actions': json.dumps(self.panel.permission_actions),
+                'permission_type': self.panel.permission_type,
+            }))
+
+        def load_permission_terms(self):
+            permission_terms_json = None
+            try:
+                data = TaxonomyTerms.objects.get(taxonomy_id=self.panel.permission_terms_id)
+                try:
+                    json.loads(data.terms_json)
+                except json.decoder.JSONDecodeError:
+                    self.permission_terms_error_message = '"Permission Terms" json wrong format'
+                permission_terms_json = data.terms_json
+            except TaxonomyTerms.DoesNotExist:
+                self.permission_terms_error_message = 'No "Permission Terms" for this id: "{}"'.format(
+                    self.panel.permission_terms_id
+                )
+            return permission_terms_json
+
+        def __init__(self, panel, instance, request, form,):
+            super().__init__(panel=panel, instance=instance, request=request, form=form)
+            self.permission_terms_error_message = None
+
