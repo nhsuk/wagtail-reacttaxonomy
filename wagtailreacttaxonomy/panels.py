@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ImproperlyConfigured
 
-from wagtail.admin.panels import FieldPanel,EditHandler
+from wagtail.admin.panels import FieldPanel, Panel
 
 from .models import TaxonomyTerms
 
@@ -26,7 +26,7 @@ class TaxonomyPanel(FieldPanel):
         )
         return kwargs
     
-    def get_bound_panel(self, instance=None, request=None, form=None ):
+    def get_bound_panel(self, instance=None, request=None, form=None, prefix=None ):
 
         if self.model is None:
             raise ImproperlyConfigured(
@@ -34,15 +34,14 @@ class TaxonomyPanel(FieldPanel):
                 % type(self).__name__
             )
 
-        if not issubclass(self.BoundPanel, EditHandler.BoundPanel):
+        if not issubclass(self.BoundPanel, Panel.BoundPanel):
             raise ImproperlyConfigured(
-                "%s.BoundPanel must be a subclass of EditHandler.BoundPanel"
+                "%s.BoundPanel must be a subclass of Panel.BoundPanel"
                 % type(self).__name__
             )
 
-        
         return self.BoundPanel(
-            panel=self, instance=instance, request=request, form=form, taxonomy_terms_id=self.taxonomy_terms_id
+            panel=self, instance=instance, request=request, form=form, prefix=prefix, taxonomy_terms_id=self.taxonomy_terms_id
         )
     
     class BoundPanel(FieldPanel.BoundPanel):
@@ -65,8 +64,8 @@ class TaxonomyPanel(FieldPanel):
                 )
             return taxonomy_terms_json
 
-        def __init__(self, panel, instance, request, form, taxonomy_terms_id):
-            super().__init__(panel=panel, instance=instance, request=request, form=form)
+        def __init__(self, panel, instance, request, form, prefix, taxonomy_terms_id):
+            super().__init__(panel=panel, instance=instance, request=request, form=form, prefix=prefix)
             self.taxonomy_terms_id = taxonomy_terms_id
             self.taxonomy_terms_error_message = None
 
@@ -102,21 +101,21 @@ class PermissionsPanel(FieldPanel):
         )
         return kwargs
 
-    def get_bound_panel(self, instance=None, request=None, form=None ):
+    def get_bound_panel(self, instance=None, request=None, form=None, prefix=None ):
         if self.model is None:
             raise ImproperlyConfigured(
                 "%s.bind_to_model(model) must be called before get_bound_panel"
                 % type(self).__name__
             )
 
-        if not issubclass(self.BoundPanel, EditHandler.BoundPanel):
+        if not issubclass(self.BoundPanel, Panel.BoundPanel):
             raise ImproperlyConfigured(
-                "%s.BoundPanel must be a subclass of EditHandler.BoundPanel"
+                "%s.BoundPanel must be a subclass of Panel.BoundPanel"
                 % type(self).__name__
             )
 
         return self.BoundPanel(
-            panel=self, instance=instance, request=request, form=form
+            panel=self, instance=instance, request=request, form=form, prefix=prefix
         )
 
     class BoundPanel(FieldPanel.BoundPanel):
@@ -150,7 +149,7 @@ class PermissionsPanel(FieldPanel):
                 )
             return permission_terms_json
 
-        def __init__(self, panel, instance, request, form,):
-            super().__init__(panel=panel, instance=instance, request=request, form=form)
+        def __init__(self, panel, instance, request, form, prefix):
+            super().__init__(panel=panel, instance=instance, request=request, form=form, prefix=prefix )
             self.permission_terms_error_message = None
 
