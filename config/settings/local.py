@@ -30,6 +30,11 @@ LOGGING = {
     },
 }
 
+if os.environ.get('RUN_MAIN') or os.environ.get('WERKZEUG_RUN_MAIN'):
+        import debugpy
+        debugpy.listen(("0.0.0.0", 3000))
+        print('Attached!')
+
 try:
     from .local import *
 except ImportError:
