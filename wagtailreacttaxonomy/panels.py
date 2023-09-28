@@ -69,7 +69,7 @@ class TaxonomyPanel(FieldPanel):
             self.taxonomy_terms_id = taxonomy_terms_id
             self.taxonomy_terms_error_message = None
 
-        def render_as_object(self):
+        def render_html(self, parent_context):
             return mark_safe(
                 render_to_string(
                 self.object_template, {
@@ -123,7 +123,7 @@ class PermissionsPanel(FieldPanel):
         object_template = "wagtailadmin/panels/permissions_panel.html"
         field_template = "wagtailadmin/panels/permissions_panel.html"
 
-        def render_as_object(self):
+        def render_html(self, parent_context):
             return mark_safe(render_to_string(self.object_template, {
                 'self': self,
                 self.panel.TEMPLATE_VAR: self,

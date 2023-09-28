@@ -29,5 +29,6 @@ services:
       - ${LOCAL_WORKSPACE_FOLDER:-.}:/code
     ports:
       - "8000:8000"
+      - "3000:3000"
     depends_on:
       - db

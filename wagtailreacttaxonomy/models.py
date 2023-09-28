@@ -97,7 +97,6 @@ class ModelTaxonomyPermissionsMixin(models.Model):
 # @receiver(pre_save, sender=PageTaxonomyPermissionsMixin)
 def format_permissions_json(sender, instance, **kwargs):
     permissions_json_formatted = {}
-    permissions_json_formatted = {}
     for group_key, groups in (json.loads(instance.permissions_json)).items():
         permissions_json_formatted[group_key] = []
         for action_key, vocs in groups.items():

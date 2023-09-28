@@ -1,10 +1,10 @@
-/* #tab-taxonomy .title-wrapper {
+#tab-taxonomy .title-wrapper {
     display: none;
 }
 
 #id_taxonomy_json, #taxonomy-terms-json {
     display: none;
-} */
+}
 
 .term-chooser label {
     float: none !important;
@@ -15,9 +15,9 @@
     width: 8px;
 }
 
-/* .global_permission, .inherit_permission, #id_permissions_json, #permission-terms-json {
+.global_permission, .inherit_permission, #id_permissions_json, #permission-terms-json {
     display: none;
-} */
+}
 
 #react-taxonomy-permissions {
     margin-bottom: 30px;
